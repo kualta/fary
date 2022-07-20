@@ -1,0 +1,10 @@
+[package]
+name = "board_editor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.7.0"
+
+[profile.release]
+opt-level = 2
