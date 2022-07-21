@@ -3,7 +3,8 @@
 mod board;
 mod piece;
 
-use crate::board::*;
+use board::*;
+use piece::*;
 use bevy::prelude::*;
 
 fn main() {
@@ -14,5 +15,9 @@ fn main() {
 
 fn generate_board() {
     let board_generator = BoardGenerator::new(IVec2::new(8, 8));
-    let board = Board::new(board_generator);
+    let tiles = Tile::new();
+    let mut pieces = Vec::new();
+    pieces.push(Piece::new());
+
+    let board = Board::new(board_generator, tiles, pieces);
 }
