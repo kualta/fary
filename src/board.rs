@@ -21,16 +21,20 @@ pub(crate) struct Tile {
     color: Color,
 }
 
-pub(crate) struct BoardGenerator {}
+pub(crate) struct BoardGenerator {
+    dimensions: IVec2,
+}
 impl BoardGenerator {
     pub(crate) fn new(dimensions: IVec2) -> Self {
-        BoardGenerator {}
+        BoardGenerator { dimensions }
     }
 
     pub(crate) fn place_pieces() {}
 }
 impl Tile {
-    pub(crate) fn new() -> Vec<Tile> {
-        todo!()
+    pub(crate) fn new() -> Tile {
+        Tile {
+            color: Color::WHITE,
+        }
     }
 }
