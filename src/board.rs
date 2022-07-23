@@ -1,40 +1,74 @@
+use core::panic;
+
 use crate::piece::Piece;
-use bevy::{math::IVec2, prelude::Color, utils::hashbrown::hash_map::IntoIter};
+use bevy::{
+    math::{IVec2, Vec3},
+    pbr::{Material, PbrBundle, StandardMaterial},
+    prelude::{Color, Commands, Handle, Mesh, Transform},
+    utils::hashbrown::hash_map::IntoIter,
+};
 
 pub(crate) struct Board {
-    generator: BoardGenerator,
+    descriptor: BoardDescriptor,
     tiles: Vec<Tile>,
     pieces: Vec<Piece>,
 }
 
 impl Board {
-    pub(crate) fn new(generator: BoardGenerator, tiles: Vec<Tile>, pieces: Vec<Piece>) -> Self {
+    pub(crate) fn new(generator: BoardDescriptor, tiles: Vec<Tile>, pieces: Vec<Piece>) -> Self {
         Board {
-            generator,
+            descriptor: generator,
             tiles,
             pieces,
         }
     }
+
+    pub(crate) fn generate(&self, mut commands: Commands) {
+        if self.tiles.is_empty() {
+            panic!("Tiles vec is empty, cannot generate board!")
+        }
+
+        // TODO: Add pattern generation
+        let mut tiles = self.tiles.iter().cloned().cycle();
+        for i in 0..self.descriptor.dimensions.x {
+            for j in 0..self.descriptor.dimensions.y {
+                let tile = tiles
+                    .next()
+                    .expect("Next tile not found?! This should never happen.");
+                commands.spawn_bundle(PbrBundle {
+                    mesh: tile.mesh.clone(),
+                    material: tile.material.clone(),
+                    transform: Transform::from_translation(Vec3::new(i as f32, 0., j as f32)),
+                    ..Default::default()
+                });
+            }
+        }
+    }
 }
 
+#[derive(Clone)]
 pub(crate) struct Tile {
-    color: Color,
+    material: Handle<StandardMaterial>,
+    mesh: Handle<Mesh>,
 }
 
-pub(crate) struct BoardGenerator {
+pub(crate) struct BoardDescriptor {
     dimensions: IVec2,
 }
-impl BoardGenerator {
+impl BoardDescriptor {
     pub(crate) fn new(dimensions: IVec2) -> Self {
-        BoardGenerator { dimensions }
+        BoardDescriptor { dimensions }
     }
 
-    pub(crate) fn place_pieces() {}
+    pub(crate) fn dimensions(&self) -> IVec2 {
+        self.dimensions
+    }
 }
 impl Tile {
-    pub(crate) fn new() -> Tile {
+    pub(crate) fn new(material: Handle<StandardMaterial>, mesh: Handle<Mesh>) -> Tile {
         Tile {
-            color: Color::WHITE,
+            material,
+            mesh
         }
     }
 }
