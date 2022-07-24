@@ -1,4 +1,4 @@
-use bevy::{prelude::Bundle, transform::{TransformBundle, self}};
+use bevy::prelude::*;
 
 pub(crate) enum ChessPiece {
     Pawn,
@@ -31,32 +31,36 @@ pub(crate) enum ShogiPiece {
 pub(crate) struct Piece {
     #[bundle]
     transform: TransformBundle,
+    mesh: Handle<Mesh>,
+    material: Handle<StandardMaterial>,
 }
 impl Piece {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(mesh: Handle<Mesh>, material: Handle<StandardMaterial>) -> Self {
         Piece {
             transform: TransformBundle::identity(),
+            mesh,
+            material,
         }
     }
 
-    pub(crate) fn chess(piece: ChessPiece) -> Self {
-        let new_piece = Piece::new();
-
-        match piece {
-            ChessPiece::Pawn => todo!(),
-            ChessPiece::Knight => todo!(),
-            ChessPiece::Bishop => todo!(),
-            ChessPiece::Rook => todo!(),
-            ChessPiece::Queen => todo!(),
-            ChessPiece::King => todo!(),
-        }
-
-        new_piece
+    pub(crate) fn chess(
+        piece: ChessPiece,
+        material: Handle<StandardMaterial>,
+        asset_server: &Res<AssetServer>,
+    ) -> Self {
+        let path = match piece {
+            ChessPiece::Pawn => "pieces/pieces.glb#Mesh2/Primitive0",
+            ChessPiece::Knight => "pieces/pieces.glb#Mesh3/Primitive0",
+            ChessPiece::Bishop => "pieces/pieces.glb#Mesh6/Primitive0",
+            ChessPiece::Rook => "pieces/pieces.glb#Mesh5/Primitive0",
+            ChessPiece::Queen => "pieces/pieces.glb#Mesh7/Primitive0",
+            ChessPiece::King => "pieces/pieces.glb#Mesh0/Primitive0",
+        };
+        let mesh = asset_server.load(path);
+        Piece::new(mesh, material)
     }
 
     pub(crate) fn shogi(piece: ShogiPiece) -> Self {
-        let new_piece = Piece::new();
-
         match piece {
             ShogiPiece::Pawn => todo!(),
             ShogiPiece::Lance => todo!(),
@@ -74,7 +78,18 @@ impl Piece {
             ShogiPiece::BishopPromoted => todo!(),
             ShogiPiece::RookPromoted => todo!(),
         }
+    }
 
-        new_piece
+    pub(crate) fn spawn_at(&self, pos: Vec3, commands: &mut Commands) {
+        commands.spawn_bundle(PbrBundle {
+            mesh: self.mesh.clone(),
+            material: self.material.clone(),
+            transform: {
+                let mut transform = Transform::from_translation(pos);
+                transform.apply_non_uniform_scale(Vec3::new(0.2, 0.2, 0.2)); // FIXME: Unify all model scales
+                transform
+            },
+            ..Default::default()
+        });
     }
 }

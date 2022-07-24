@@ -16,6 +16,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(camera_setup)
         .add_startup_system(generate_board)
+        .add_startup_system(place_pieces)
         .run();
 }
 
@@ -43,7 +44,7 @@ fn generate_board(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let mesh = meshes.add(Mesh::from(shape::Plane { size: 1. }));
-    let white_material = materials.add(Color::rgb(0.9, 0.9, 0.9).into());
+    let white_material = materials.add(Color::rgb(1.0, 0.9, 0.9).into());
     let black_material = materials.add(Color::rgb(0.1, 0.1, 0.1).into());
 
     let mut tiles = Vec::new();
@@ -53,4 +54,37 @@ fn generate_board(
     let board_descriptor = BoardDescriptor::new(IVec2::new(8, 8), tiles);
 
     let board = CheckersBoardGenerator::generate(board_descriptor, commands);
+}
+
+fn place_pieces(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    // Load all the meshes
+    // let king_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh0/Primitive0");
+    // let king_cross_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh1/Primitive0");
+    // let pawn_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh2/Primitive0");
+    // let knight_1_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh3/Primitive0");
+    // let knight_2_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh4/Primitive0");
+    // let rook_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh5/Primitive0");
+    // let bishop_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh6/Primitive0");
+    // let queen_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh7/Primitive0");
+
+    let white_material = materials.add(Color::rgb(1.0, 1.0, 1.0).into());
+    let black_material = materials.add(Color::rgb(0.0, 0.0, 0.0).into());
+
+    let pawn = Piece::chess(ChessPiece::Pawn, white_material.clone(), &asset_server)
+        .spawn_at(Vec3::new(1., 0., 0.), &mut commands);
+    let rook = Piece::chess(ChessPiece::Rook, white_material.clone(), &asset_server)
+        .spawn_at(Vec3::new(0., 0., 0.), &mut commands);
+    let knight = Piece::chess(ChessPiece::Knight, white_material.clone(), &asset_server)
+        .spawn_at(Vec3::new(0., 0., 1.), &mut commands);
+    let bishop = Piece::chess(ChessPiece::Bishop, white_material.clone(), &asset_server)
+        .spawn_at(Vec3::new(0., 0., 2.), &mut commands);
+    let queen = Piece::chess(ChessPiece::Queen, white_material.clone(), &asset_server)
+        .spawn_at(Vec3::new(0., 0., 3.), &mut commands);
+    let king = Piece::chess(ChessPiece::King, white_material.clone(), &asset_server)
+        .spawn_at(Vec3::new(0., 0., 4.), &mut commands);
+
 }

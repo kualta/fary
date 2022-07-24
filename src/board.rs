@@ -1,13 +1,7 @@
 use core::panic;
 
 use crate::piece::Piece;
-use bevy::{
-    math::{IVec2, Vec3},
-    pbr::{Material, PbrBundle, StandardMaterial},
-    prelude::{Color, Commands, Handle, Mesh, Transform},
-    utils::hashbrown::hash_map::IntoIter,
-};
-
+use bevy::prelude::*;
 pub(crate) struct Board {
     descriptor: BoardDescriptor,
     pieces: Option<Vec<Piece>>,
