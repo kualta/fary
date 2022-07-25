@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, reflect::List, utils::HashSet};
 
 pub(crate) enum ChessPiece {
     Pawn,
@@ -49,12 +49,12 @@ impl Piece {
         asset_server: &Res<AssetServer>,
     ) -> Self {
         let path = match piece {
-            ChessPiece::Pawn => "pieces/pieces.glb#Mesh2/Primitive0",
-            ChessPiece::Knight => "pieces/pieces.glb#Mesh3/Primitive0",
-            ChessPiece::Bishop => "pieces/pieces.glb#Mesh6/Primitive0",
-            ChessPiece::Rook => "pieces/pieces.glb#Mesh5/Primitive0",
-            ChessPiece::Queen => "pieces/pieces.glb#Mesh7/Primitive0",
             ChessPiece::King => "pieces/pieces.glb#Mesh0/Primitive0",
+            ChessPiece::Pawn => "pieces/pieces.glb#Mesh1/Primitive0",
+            ChessPiece::Knight => "pieces/pieces.glb#Mesh2/Primitive0",
+            ChessPiece::Rook => "pieces/pieces.glb#Mesh3/Primitive0",
+            ChessPiece::Bishop => "pieces/pieces.glb#Mesh4/Primitive0",
+            ChessPiece::Queen => "pieces/pieces.glb#Mesh5/Primitive0",
         };
         let mesh = asset_server.load(path);
         Piece::new(mesh, material)
@@ -80,6 +80,7 @@ impl Piece {
         }
     }
 
+    // FIXME: Add to board, then spawn in board coordinates
     pub(crate) fn spawn_at(&self, pos: Vec3, commands: &mut Commands) {
         commands.spawn_bundle(PbrBundle {
             mesh: self.mesh.clone(),
@@ -91,5 +92,18 @@ impl Piece {
             },
             ..Default::default()
         });
+    }
+}
+
+pub(crate) struct PieceSet {
+    set: HashSet<Piece>
+}
+impl PieceSet {
+    pub(crate) fn chess () {
+        todo!();
+    }
+
+    pub(crate) fn shogi () {
+        todo!();
     }
 }

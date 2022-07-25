@@ -61,16 +61,6 @@ fn place_pieces(
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    // Load all the meshes
-    // let king_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh0/Primitive0");
-    // let king_cross_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh1/Primitive0");
-    // let pawn_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh2/Primitive0");
-    // let knight_1_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh3/Primitive0");
-    // let knight_2_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh4/Primitive0");
-    // let rook_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh5/Primitive0");
-    // let bishop_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh6/Primitive0");
-    // let queen_handle: Handle<Mesh> = asset_server.load("pieces/pieces.glb#Mesh7/Primitive0");
-
     let white_material = materials.add(Color::rgb(1.0, 1.0, 1.0).into());
     let black_material = materials.add(Color::rgb(0.0, 0.0, 0.0).into());
 
@@ -86,5 +76,4 @@ fn place_pieces(
         .spawn_at(Vec3::new(0., 0., 3.), &mut commands);
     let king = Piece::chess(ChessPiece::King, white_material.clone(), &asset_server)
         .spawn_at(Vec3::new(0., 0., 4.), &mut commands);
-
 }
