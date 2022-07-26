@@ -1,13 +1,14 @@
 use core::panic;
 
-use crate::piece::Piece;
+use crate::{piece::Piece, fen::FenError};
 use bevy::prelude::*;
+
 pub(crate) struct Board {
     descriptor: BoardDescriptor,
     pieces: Option<Vec<Piece>>,
 }
-
 impl Board {
+    /// Creates a new [`Board`] based on [`BoardDescriptor`].
     pub(crate) fn new(descriptor: BoardDescriptor, pieces: Option<Vec<Piece>>) -> Self {
         Board {
             descriptor,
@@ -15,10 +16,15 @@ impl Board {
         }
     }
 
-    pub(crate) fn generate(&self, mut commands: Commands) {
-        if self.descriptor.tiles.is_empty() {
-            panic!("Tiles vec is empty, cannot generate board!")
-        }
+    /// Places pieces on the board based on the provided Forsyth–Edwards Notation (FEN) string. 
+    /// # Errors
+    ///
+    /// This function will return an error if: 
+    /// - provided [`PieceSet`] doesn't match the FEN.
+    /// - prvided FEN is not valid
+    /// 
+    pub(crate) fn from_fen(&self, fen: &str) -> Result<(), FenError> {
+        todo!() 
     }
 }
 

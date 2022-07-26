@@ -1,6 +1,7 @@
 #[allow(unused, dead_code)]
 mod board;
 mod piece;
+mod fen;
 
 use bevy::prelude::*;
 use board::*;
