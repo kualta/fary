@@ -27,9 +27,7 @@ pub(crate) enum ShogiPiece {
     RookPromoted,
 }
 
-#[derive(Bundle)]
 pub(crate) struct Piece {
-    #[bundle]
     transform: TransformBundle,
     mesh: Handle<Mesh>,
     material: Handle<StandardMaterial>,

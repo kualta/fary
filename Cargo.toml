@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.7.0", features = ["dynamic"] }
+regex = "1.6.0"
 
 [profile.dev]
 opt-level = 1
