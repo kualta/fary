@@ -19,11 +19,22 @@ impl Fen {
         };
 
         let piece_data = data.next().unwrap().to_owned();
+        if !Regex::new(r"(([rnbqkpRNBQKP]|[1-9]|[/]){1,9}){8}").unwrap().is_match(&piece_data) {
+            return Err(FenError::InvalidNotation);
+        };
+
         let active_color = data.next().unwrap().to_owned();
+        if !Regex::new(r"[wb]|-").unwrap().is_match(&active_color) {
+            return Err(FenError::InvalidNotation);
+        };
+
         let castling = data.next().unwrap().to_owned();
+        if !Regex::new(r"[kqKQ]{1,4}|-").unwrap().is_match(&castling) {
+            return Err(FenError::InvalidNotation);
+        };
 
         let target = data.next().unwrap().to_owned();
-        if !Regex::new(r"\w{2}").unwrap().is_match(&target) {
+        if !Regex::new(r"[A-Za-z][1-9]|-").unwrap().is_match(&target) {
             return Err(FenError::InvalidNotation);
         };
 
