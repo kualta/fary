@@ -2,6 +2,8 @@ use std::{error::Error, fmt::Display, num::ParseIntError};
 
 use regex::Regex;
 
+/// Struct that represents Universal Notation Data, 
+/// used for describing positions of any fairy board game
 pub(crate) struct UniversalNotation {}
 impl From<Fen> for UniversalNotation {
     fn from(fen: Fen) -> Self {
@@ -13,7 +15,9 @@ impl From<Sfen> for UniversalNotation {
         todo!()
     }
 }
-/// Struct that represents Forsyth–Edwards Notation data
+
+/// Struct that represents [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) (FEN) data,
+/// used for describing positions of Chess games
 pub(crate) struct Fen {
     piece_data: String,
     active_color: String,
@@ -29,32 +33,32 @@ impl Fen {
     ///
     /// # Errors
     ///
-    /// This function will return [`FenError::InvalidNotation`] if provided string doesn't match standard notation
-    pub(crate) fn from_raw(input: &str) -> Result<Fen, FenError> {
+    /// This function will return [`NotationError::InvalidNotation`] if provided string doesn't match standard notation
+    pub(crate) fn from_raw(input: &str) -> Result<Fen, NotationError> {
         let mut data = input.split_whitespace();
 
         if data.clone().count() != 6 {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let piece_data = data.next().unwrap().to_owned();
         if !Regex::new(r"(([rnbqkpRNBQKP]|[1-9]|[/]){1,9}){8}").unwrap().is_match(&piece_data) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let active_color = data.next().unwrap().to_owned();
         if !Regex::new(r"[wb]|-").unwrap().is_match(&active_color) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let castling = data.next().unwrap().to_owned();
         if !Regex::new(r"[kqKQ]{1,4}|-").unwrap().is_match(&castling) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let target = data.next().unwrap().to_owned();
         if !Regex::new(r"[A-Za-z][1-9]|-").unwrap().is_match(&target) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let halfmove_clock = data.next().unwrap().parse()?;
@@ -79,26 +83,33 @@ pub(crate) struct Sfen {
     hand_piece_data: String,
 }
 impl Sfen {
-    pub(crate) fn from_raw(input: &str) -> Result<Sfen, FenError> {
+    /// Contructs a [`Sfen`] notation object from raw (Western) SFEN string
+    /// 
+    /// Example of a valid SFEN notation string: `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1` 
+    /// 
+    /// # Errors
+    ///
+    /// This function will return [`NotationError::InvalidNotation`] if provided string doesn't match the standard notation
+    pub(crate) fn from_raw(input: &str) -> Result<Sfen, NotationError> {
         let mut data = input.split_whitespace();
 
         if data.clone().count() != 3 {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let piece_data = data.next().unwrap().to_owned();
         if !Regex::new(r"(([plnsgkPLNSGK]|[1-9]|[/]|[+]){1,9}){9}").unwrap().is_match(&piece_data) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let active_color = data.next().unwrap().to_owned();
         if !Regex::new(r"[wb]").unwrap().is_match(&active_color) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         let hand_piece_data = data.next().unwrap().to_owned();
         if !Regex::new(r"(([plnsgkPLNSGK]|[1-9]|[/]|[+]){1,9}){9}").unwrap().is_match(&hand_piece_data) {
-            return Err(FenError::InvalidNotation);
+            return Err(NotationError::InvalidNotation);
         };
 
         Ok(Sfen {
@@ -110,24 +121,22 @@ impl Sfen {
 }
 
 #[derive(Debug)]
-pub(crate) enum FenError {
+pub(crate) enum NotationError {
     InvalidNotation,
-    InvalidPieceSet,
-    PieceNotFound,
+    InvalidPiece,
 }
-impl Display for FenError {
+impl Display for NotationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            FenError::InvalidNotation => write!(f, "FEN is invalid"),
-            FenError::InvalidPieceSet => write!(f, "PieceSet is invalid"),
-            FenError::PieceNotFound => write!(f, "Piece not found in PieceSet"),
+            NotationError::InvalidNotation => write!(f, "Notation is invalid"),
+            NotationError::InvalidPiece => write!(f, "Piece is invalid"),
         }
     }
 }
-impl Error for FenError {}
-impl From<ParseIntError> for FenError {
+impl Error for NotationError {}
+impl From<ParseIntError> for NotationError {
     fn from(_: ParseIntError) -> Self {
-        FenError::InvalidNotation
+        NotationError::InvalidNotation
     }
 }
 

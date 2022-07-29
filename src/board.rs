@@ -1,6 +1,6 @@
 use core::panic;
 
-use crate::{piece::Piece, notation::FenError};
+use crate::{piece::Piece, notation::NotationError};
 use bevy::prelude::*;
 
 pub(crate) struct Board {
@@ -23,7 +23,7 @@ impl Board {
     /// - provided [`PieceSet`] doesn't match the FEN.
     /// - prvided FEN is not valid
     /// 
-    pub(crate) fn from_fen(&self, fen: &str) -> Result<(), FenError> {
+    pub(crate) fn from_fen(&self, fen: &str) -> Result<(), NotationError> {
         todo!() 
     }
 }
