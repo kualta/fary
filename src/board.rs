@@ -1,6 +1,6 @@
 use core::panic;
 
-use crate::{piece::Piece, fen::FenError};
+use crate::{piece::Piece, notation::FenError};
 use bevy::prelude::*;
 
 pub(crate) struct Board {

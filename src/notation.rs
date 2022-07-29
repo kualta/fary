@@ -2,6 +2,18 @@ use std::{error::Error, fmt::Display, num::ParseIntError};
 
 use regex::Regex;
 
+pub(crate) struct UniversalNotation {}
+impl From<Fen> for UniversalNotation {
+    fn from(fen: Fen) -> Self {
+        todo!()
+    }
+}
+impl From<Sfen> for UniversalNotation {
+    fn from(sfen: Sfen) -> Self {
+        todo!()
+    }
+}
+/// Struct that represents Forsyth–Edwards Notation data
 pub(crate) struct Fen {
     piece_data: String,
     active_color: String,
@@ -11,7 +23,14 @@ pub(crate) struct Fen {
     move_number: i32,
 }
 impl Fen {
-    pub(crate) fn parse(input: &str) -> Result<Fen, FenError> {
+    /// Contructs a [`Fen`] object from raw FEN string
+    /// 
+    /// Example of a valid FEN notation string: `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1` (The starting position)
+    ///
+    /// # Errors
+    ///
+    /// This function will return [`FenError::InvalidNotation`] if provided string doesn't match standard notation
+    pub(crate) fn from_raw(input: &str) -> Result<Fen, FenError> {
         let mut data = input.split_whitespace();
 
         if data.clone().count() != 6 {
@@ -52,6 +71,44 @@ impl Fen {
     }
 }
 
+/// SFEN is an extension of [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) [`Fen`] 
+/// used for describing board positions of shogi games.
+pub(crate) struct Sfen {
+    piece_data: String,
+    active_color: String,
+    hand_piece_data: String,
+}
+impl Sfen {
+    pub(crate) fn from_raw(input: &str) -> Result<Sfen, FenError> {
+        let mut data = input.split_whitespace();
+
+        if data.clone().count() != 3 {
+            return Err(FenError::InvalidNotation);
+        };
+
+        let piece_data = data.next().unwrap().to_owned();
+        if !Regex::new(r"(([plnsgkPLNSGK]|[1-9]|[/]|[+]){1,9}){9}").unwrap().is_match(&piece_data) {
+            return Err(FenError::InvalidNotation);
+        };
+
+        let active_color = data.next().unwrap().to_owned();
+        if !Regex::new(r"[wb]").unwrap().is_match(&active_color) {
+            return Err(FenError::InvalidNotation);
+        };
+
+        let hand_piece_data = data.next().unwrap().to_owned();
+        if !Regex::new(r"(([plnsgkPLNSGK]|[1-9]|[/]|[+]){1,9}){9}").unwrap().is_match(&hand_piece_data) {
+            return Err(FenError::InvalidNotation);
+        };
+
+        Ok(Sfen {
+            piece_data,
+            active_color,
+            hand_piece_data,
+        })
+    }
+}
+
 #[derive(Debug)]
 pub(crate) enum FenError {
     InvalidNotation,
@@ -73,3 +130,4 @@ impl From<ParseIntError> for FenError {
         FenError::InvalidNotation
     }
 }
+
