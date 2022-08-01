@@ -1,6 +1,6 @@
 use core::panic;
 
-use crate::{piece::Piece, notation::NotationError};
+use crate::{piece::Piece, notation::{NotationError, Fen}};
 use bevy::prelude::*;
 
 pub(crate) struct Board {
@@ -23,8 +23,28 @@ impl Board {
     /// - provided [`PieceSet`] doesn't match the FEN.
     /// - prvided FEN is not valid
     /// 
-    pub(crate) fn from_fen(&self, fen: &str) -> Result<(), NotationError> {
-        todo!() 
+    pub(crate) fn from_fen(&mut self, fen: &Fen) -> Result<(), NotationError> {
+        let mut data = fen.piece_data.split("/");
+        let mut row = 0;
+        let mut col = 0;
+        let mut pieces = Vec::new();
+        for piece_data in data {
+            for c in piece_data.chars() {
+                if c.is_digit(10) {
+                    col += c.to_digit(10).unwrap() as i32;
+                } else {
+                    let piece = match Piece::from_char(c) {
+                        Ok(piece) => piece,
+                        Err(err) => return Err(err),
+                    };
+                    pieces.push(piece);
+                    col += 1;
+                }
+            }
+            row -= 1;
+            col = 0;
+        }
+        Ok(())
     }
 }
 
@@ -43,12 +63,12 @@ impl Tile {
 }
 
 pub(crate) trait BoardGenerator {
-    fn generate(descriptor: BoardDescriptor, commands: Commands) -> Board;
+    fn generate(descriptor: BoardDescriptor, commands: &mut Commands) -> Board;
 }
 
 pub(crate) struct CheckersBoardGenerator {}
 impl BoardGenerator for CheckersBoardGenerator {
-    fn generate(descriptor: BoardDescriptor, mut commands: Commands) -> Board {
+    fn generate(descriptor: BoardDescriptor, mut commands: &mut Commands) -> Board {
         let mut tiles = descriptor.tiles.iter().cycle();
         let first_tile = tiles
             .next()

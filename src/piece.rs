@@ -1,5 +1,7 @@
 use bevy::{prelude::*, reflect::List, utils::HashSet};
 
+use crate::notation::NotationError;
+
 pub(crate) enum ChessPiece {
     Pawn,
     Knight,
@@ -27,35 +29,63 @@ pub(crate) enum ShogiPiece {
     RookPromoted,
 }
 
+pub(crate) struct ChessMesh {
+    pub(crate) pawn: Handle<Mesh>,
+    pub(crate) knight: Handle<Mesh>,
+    pub(crate) bishop: Handle<Mesh>,
+    pub(crate) rook: Handle<Mesh>,
+    pub(crate) queen: Handle<Mesh>,
+    pub(crate) king: Handle<Mesh>,
+}
+
 pub(crate) struct Piece {
     transform: TransformBundle,
-    mesh: Handle<Mesh>,
-    material: Handle<StandardMaterial>,
+    mesh: Option<Handle<Mesh>>,
+    material: Option<Handle<StandardMaterial>>,
 }
 impl Piece {
     pub(crate) fn new(mesh: Handle<Mesh>, material: Handle<StandardMaterial>) -> Self {
         Piece {
             transform: TransformBundle::identity(),
-            mesh,
-            material,
+            mesh: Some(mesh),
+            material: Some(material),
         }
+    }
+
+    pub(crate) fn set_material(&mut self, material: Handle<StandardMaterial>) {
+        self.material = Some(material);
+    }
+
+    pub(crate) fn set_mesh(&mut self, mesh: Handle<Mesh>) {
+        self.mesh = Some(mesh);
+    }
+
+    pub(crate) fn from_char(c: char) -> Result<Piece, NotationError> {
+        let piece = match c {
+            'p' => ChessPiece::Pawn,
+            'n' => ChessPiece::Knight,
+            'b' => ChessPiece::Bishop,
+            'r' => ChessPiece::Rook,
+            'q' => ChessPiece::Queen,
+            'k' => ChessPiece::King,
+            _ => return Err(NotationError::InvalidPiece(c.to_string())),
+        };
+        Ok(Piece::chess(piece))
     }
 
     pub(crate) fn chess(
         piece: ChessPiece,
-        material: Handle<StandardMaterial>,
-        asset_server: &Res<AssetServer>,
     ) -> Self {
-        let path = match piece {
-            ChessPiece::King => "pieces/pieces.glb#Mesh0/Primitive0",
-            ChessPiece::Pawn => "pieces/pieces.glb#Mesh1/Primitive0",
-            ChessPiece::Knight => "pieces/pieces.glb#Mesh2/Primitive0",
-            ChessPiece::Rook => "pieces/pieces.glb#Mesh3/Primitive0",
-            ChessPiece::Bishop => "pieces/pieces.glb#Mesh4/Primitive0",
-            ChessPiece::Queen => "pieces/pieces.glb#Mesh5/Primitive0",
-        };
-        let mesh = asset_server.load(path);
-        Piece::new(mesh, material)
+        todo!();
+        // let mesh = match piece {
+        //     ChessPiece::Pawn => meshes.pawn,
+        //     ChessPiece::Knight => meshes.knight,
+        //     ChessPiece::Bishop => meshes.bishop,
+        //     ChessPiece::Rook => meshes.rook,
+        //     ChessPiece::Queen => meshes.queen,
+        //     ChessPiece::King => meshes.king,
+        // };
+        // Piece::new(mesh, material)
     }
 
     pub(crate) fn shogi(piece: ShogiPiece) -> Self {
@@ -81,8 +111,8 @@ impl Piece {
     // FIXME: Add to board, then spawn in board coordinates
     pub(crate) fn spawn_at(&self, pos: Vec3, commands: &mut Commands) {
         commands.spawn_bundle(PbrBundle {
-            mesh: self.mesh.clone(),
-            material: self.material.clone(),
+            mesh: self.mesh.as_ref().unwrap().clone(),
+            material: self.material.as_ref().unwrap().clone(),
             transform: {
                 let mut transform = Transform::from_translation(pos);
                 transform.apply_non_uniform_scale(Vec3::new(0.2, 0.2, 0.2)); // FIXME: Unify all model scales

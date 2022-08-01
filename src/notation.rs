@@ -19,12 +19,12 @@ impl From<Sfen> for UniversalNotation {
 /// Struct that represents [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) (FEN) data,
 /// used for describing positions of Chess games
 pub(crate) struct Fen {
-    piece_data: String,
-    active_color: String,
-    castling: String,
-    en_passant_target: Option<String>,
-    halfmove_clock: i32,
-    move_number: i32,
+    pub(crate) piece_data: String,
+    pub(crate) active_color: String,
+    pub(crate) castling: String,
+    pub(crate) en_passant_target: Option<String>,
+    pub(crate) halfmove_clock: i32,
+    pub(crate) move_number: i32,
 }
 impl Fen {
     /// Contructs a [`Fen`] object from raw FEN string
@@ -58,6 +58,7 @@ impl Fen {
 
         let target = data.next().unwrap().to_owned();
         if !Regex::new(r"[A-Za-z][1-9]|-").unwrap().is_match(&target) {
+
             return Err(NotationError::InvalidNotation);
         };
 
@@ -123,13 +124,13 @@ impl Sfen {
 #[derive(Debug)]
 pub(crate) enum NotationError {
     InvalidNotation,
-    InvalidPiece,
+    InvalidPiece(String),
 }
 impl Display for NotationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             NotationError::InvalidNotation => write!(f, "Notation is invalid"),
-            NotationError::InvalidPiece => write!(f, "Piece is invalid"),
+            NotationError::InvalidPiece(piece) => write!(f, "\"{}\" piece is invalid", piece),
         }
     }
 }
