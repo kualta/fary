@@ -1,4 +1,4 @@
-use bevy::{prelude::*, reflect::List, utils::HashSet};
+use bevy::{prelude::*, utils::HashSet};
 
 use crate::notation::NotationError;
 
@@ -9,6 +9,20 @@ pub(crate) enum ChessPiece {
     Rook,
     Queen,
     King,
+}
+impl ChessPiece {
+    pub(crate) fn from_char(c: &char) -> Result<ChessPiece, NotationError> {
+        let piece = match c {
+            'p' | 'P' => ChessPiece::Pawn,
+            'n' | 'N' => ChessPiece::Knight,
+            'b' | 'B' => ChessPiece::Bishop,
+            'r' | 'R' => ChessPiece::Rook,
+            'q' | 'Q' => ChessPiece::Queen,
+            'k' | 'K' => ChessPiece::King,
+            _ => return Err(NotationError::InvalidPiece(c.to_string())),
+        };
+        Ok(piece)
+    }
 }
 
 pub(crate) enum ShogiPiece {
@@ -60,22 +74,7 @@ impl Piece {
         self.mesh = Some(mesh);
     }
 
-    pub(crate) fn from_char(c: char) -> Result<Piece, NotationError> {
-        let piece = match c {
-            'p' => ChessPiece::Pawn,
-            'n' => ChessPiece::Knight,
-            'b' => ChessPiece::Bishop,
-            'r' => ChessPiece::Rook,
-            'q' => ChessPiece::Queen,
-            'k' => ChessPiece::King,
-            _ => return Err(NotationError::InvalidPiece(c.to_string())),
-        };
-        Ok(Piece::chess(piece))
-    }
-
-    pub(crate) fn chess(
-        piece: ChessPiece,
-    ) -> Self {
+    pub(crate) fn chess(piece: ChessPiece) -> Self {
         todo!();
         // let mesh = match piece {
         //     ChessPiece::Pawn => meshes.pawn,
@@ -124,14 +123,14 @@ impl Piece {
 }
 
 pub(crate) struct PieceSet {
-    set: HashSet<Piece>
+    set: HashSet<Piece>,
 }
 impl PieceSet {
-    pub(crate) fn chess () {
+    pub(crate) fn chess() {
         todo!();
     }
 
-    pub(crate) fn shogi () {
+    pub(crate) fn shogi() {
         todo!();
     }
 }
