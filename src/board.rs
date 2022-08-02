@@ -1,4 +1,5 @@
 use core::panic;
+use std::fmt::{Display, Formatter};
 
 use crate::{
     notation::{Fen, NotationError},
@@ -58,6 +59,13 @@ impl Tile {
 
 pub(crate) enum BoardError {
     InvalidBoardDescriptor,
+}
+impl Display for BoardError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BoardError::InvalidBoardDescriptor => write!(f, "Invalid board descriptor"),
+        }
+    }
 }
 
 pub(crate) trait BoardGenerator {

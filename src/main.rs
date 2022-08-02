@@ -58,7 +58,10 @@ fn generate_board(
 
     let board_descriptor = BoardDescriptor::new(IVec2::new(8, 8), tiles);
 
-    let board = CheckersBoardGenerator::generate(board_descriptor, &mut commands);
+    let board = match CheckersBoardGenerator::generate(board_descriptor, &mut commands) {
+        Ok(board) => board,
+        Err(err) => panic!("{}", err),
+    };
     commands.insert_resource(board);
 }
 
