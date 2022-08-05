@@ -3,20 +3,16 @@ use std::fmt::{Display, Formatter};
 
 use crate::{
     notation::{Fen, NotationError},
-    piece::{ChessPiece, Piece},
+    piece::{ChessPiece, Piece, PieceSet},
 };
 use bevy::prelude::*;
 
 pub(crate) struct Board {
     descriptor: BoardDescriptor,
+    set: Option<Handle<PieceSet>>,
     pieces: Option<Vec<Piece>>,
 }
 impl Board {
-    /// Creates a new [`Board`] based on [`BoardDescriptor`].
-    pub(crate) fn new(descriptor: BoardDescriptor, pieces: Option<Vec<Piece>>) -> Self {
-        Board { descriptor, pieces }
-    }
-
     /// Places pieces on the board based on the provided Forsyth–Edwards Notation (FEN) string.
     /// # Errors
     ///
@@ -31,10 +27,8 @@ impl Board {
                 if c.is_digit(10) {
                     col += c.to_digit(10).unwrap() as i32;
                 } else {
-                    let piece = Piece::chess(match ChessPiece::from_char(&c) {
-                        Ok(piece) => piece,
-                        Err(err) => return Err(err),
-                    });
+                    let (piece_kind, piece_color) = ChessPiece::from_char(&c)?;
+                    let piece = Piece::chess(piece_kind, piece_color);
                     pieces.push(piece);
                     col += 1;
                 }
@@ -43,6 +37,10 @@ impl Board {
             col = 0;
         }
         Ok(())
+    }
+
+    pub(crate) fn set_pieces(&mut self, set: Option<Handle<PieceSet>>) {
+        self.set = set;
     }
 }
 
@@ -98,7 +96,11 @@ impl BoardGenerator for CheckersBoardGenerator {
                 });
             }
         }
-        Ok(Board::new(descriptor, None))
+        Ok(Board {
+            descriptor,
+            set: None,
+            pieces: None,
+        })
     }
 }
 

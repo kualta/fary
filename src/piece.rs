@@ -1,4 +1,4 @@
-use bevy::{prelude::*, utils::HashSet};
+use bevy::{prelude::*, utils::HashSet, reflect::TypeUuid};
 
 use crate::notation::NotationError;
 
@@ -10,8 +10,12 @@ pub(crate) enum ChessPiece {
     Queen,
     King,
 }
+pub(crate) enum PieceColor {
+    White,
+    Black,
+}
 impl ChessPiece {
-    pub(crate) fn from_char(c: &char) -> Result<ChessPiece, NotationError> {
+    pub(crate) fn from_char(c: &char) -> Result<(ChessPiece, PieceColor), NotationError> {
         let piece = match c {
             'p' | 'P' => ChessPiece::Pawn,
             'n' | 'N' => ChessPiece::Knight,
@@ -21,7 +25,8 @@ impl ChessPiece {
             'k' | 'K' => ChessPiece::King,
             _ => return Err(NotationError::InvalidPiece(c.to_string())),
         };
-        Ok(piece)
+        let color = if c.is_lowercase() { PieceColor::White } else { PieceColor::Black };
+        Ok((piece, color))
     }
 }
 
@@ -74,17 +79,8 @@ impl Piece {
         self.mesh = Some(mesh);
     }
 
-    pub(crate) fn chess(piece: ChessPiece) -> Self {
+    pub(crate) fn chess(piece: ChessPiece, color: PieceColor) -> Self {
         todo!();
-        // let mesh = match piece {
-        //     ChessPiece::Pawn => meshes.pawn,
-        //     ChessPiece::Knight => meshes.knight,
-        //     ChessPiece::Bishop => meshes.bishop,
-        //     ChessPiece::Rook => meshes.rook,
-        //     ChessPiece::Queen => meshes.queen,
-        //     ChessPiece::King => meshes.king,
-        // };
-        // Piece::new(mesh, material)
     }
 
     pub(crate) fn shogi(piece: ShogiPiece) -> Self {
@@ -122,15 +118,6 @@ impl Piece {
     }
 }
 
-pub(crate) struct PieceSet {
-    set: HashSet<Piece>,
-}
-impl PieceSet {
-    pub(crate) fn chess() {
-        todo!();
-    }
-
-    pub(crate) fn shogi() {
-        todo!();
-    }
-}
+#[derive(TypeUuid)]
+#[uuid = "42c11046-af9b-4084-a915-f70b9332c8fa"]
+pub(crate) struct PieceSet (HashSet<Piece>);
