@@ -1,4 +1,4 @@
-use bevy::{prelude::*, utils::HashSet, reflect::TypeUuid};
+use bevy::{prelude::*, reflect::TypeUuid, utils::HashSet};
 
 use crate::notation::NotationError;
 
@@ -25,7 +25,11 @@ impl ChessPiece {
             'k' | 'K' => ChessPiece::King,
             _ => return Err(NotationError::InvalidPiece(c.to_string())),
         };
-        let color = if c.is_lowercase() { PieceColor::White } else { PieceColor::Black };
+        let color = if c.is_lowercase() {
+            PieceColor::White
+        } else {
+            PieceColor::Black
+        };
         Ok((piece, color))
     }
 }
@@ -71,6 +75,16 @@ impl Piece {
         }
     }
 
+    pub(crate) fn from_betza(
+        betza: &str,
+        mesh: Option<Handle<Mesh>>,
+        material: Option<Handle<StandardMaterial>>,
+    ) -> Self {
+        let mut piece = Piece::new(mesh.unwrap_or_default(), material.unwrap_or_default());
+        todo!("generate betza matrices");
+        piece
+    }
+
     pub(crate) fn set_material(&mut self, material: Handle<StandardMaterial>) {
         self.material = Some(material);
     }
@@ -80,7 +94,14 @@ impl Piece {
     }
 
     pub(crate) fn chess(piece: ChessPiece, color: PieceColor) -> Self {
-        todo!();
+        match piece {
+            ChessPiece::Pawn => todo!(),
+            ChessPiece::Knight => todo!(),
+            ChessPiece::Bishop => todo!(),
+            ChessPiece::Rook => todo!(),
+            ChessPiece::Queen => todo!(),
+            ChessPiece::King => todo!(),
+        }
     }
 
     pub(crate) fn shogi(piece: ShogiPiece) -> Self {
@@ -120,4 +141,4 @@ impl Piece {
 
 #[derive(TypeUuid)]
 #[uuid = "42c11046-af9b-4084-a915-f70b9332c8fa"]
-pub(crate) struct PieceSet (HashSet<Piece>);
+pub(crate) struct PieceSet(HashSet<Piece>);

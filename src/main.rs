@@ -30,7 +30,7 @@ fn camera_setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn_bundle(PerspectiveCameraBundle {
+    commands.spawn_bundle(Camera3dBundle {
         transform: Transform::from_matrix(Mat4::from_rotation_translation(
             Quat::from_xyzw(-0.3, -0.5, -0.3, 0.5).normalize(),
             Vec3::new(-7.0, 20.0, 4.0),
@@ -75,16 +75,10 @@ fn place_pieces(
     let black_material = materials.add(Color::rgb(0.0, 0.0, 0.0).into());
 
     let fen = "8/8/8/8/8/8/8/8 w - - 0 1";
-    board.from_fen(&Fen::from_raw(fen).unwrap());
-    // let knight = Piece::chess(ChessPiece::Knight, white_material.clone(), &asset_server)
-    //     .spawn_at(Vec3::new(0., 0., 1.), &mut commands);
-    // let bishop = Piece::chess(ChessPiece::Bishop, white_material.clone(), &asset_server)
-    //     .spawn_at(Vec3::new(0., 0., 2.), &mut commands);
-    // let queen = Piece::chess(ChessPiece::Queen, white_material.clone(), &asset_server)
-    //     .spawn_at(Vec3::new(0., 0., 3.), &mut commands);
-    // let king = Piece::chess(ChessPiece::King, white_material.clone(), &asset_server)
-    //     .spawn_at(Vec3::new(0., 0., 4.), &mut commands);
-    
+    match board.from_fen(&Fen::from_raw(fen).unwrap()) {
+        Err(_) => panic!(),
+        Ok(_) => { },
+    };
 }
 
 fn load_pieces(
